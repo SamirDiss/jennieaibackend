@@ -1,0 +1,12 @@
+# Virtual environment
+venv/
+lottie_env/
+
+# Python cache
+__pycache__/
+
+# Environment variables file
+.env
+
+# VS Code settings
+.vscode/
