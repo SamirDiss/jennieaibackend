@@ -235,10 +235,7 @@ async def getChatCompletion(request: ChatCompletionRequest):
 
 @app.post("/getReference")
 async def getReference(request: Request):
-    headers = {
-        "Content-Type": "application/json",
-        "api-key": API_KEY,
-    }
+
     body = await request.json()
     reference = body.get('reference')
     prompt = [
@@ -262,20 +259,24 @@ async def getReference(request: Request):
             "content": reference
         }]
         
-    req_body = {
-            "messages": prompt,
-            "max_tokens": 800,
-            "temperature": 0.5,
-            "frequency_penalty":0 ,
-            "presence_penalty": 0,
-            "top_p": 0.8,
-            "stop": None,
-        }
+
     
     try:
-        response = requests.post(REFERENCE_COMPLETION_API_URL, json=req_body, headers=headers)
-        response.raise_for_status()
-        return response.json()
+        
+        completion = client.chat.completions.create(
+                    model="Jennei-gpt-35-turbo-16k",
+                    messages=prompt,
+                    
+                    max_tokens=800,
+                    temperature=0.5,
+                    top_p=0.8,
+                    frequency_penalty=0,
+                    presence_penalty=0,
+                    stop=None,
+                    stream=False
+                )
+        
+        return completion
     except requests.exceptions.RequestException as e:
         print("Error:", e)
         raise HTTPException(status_code=500, detail=e)
