@@ -11,9 +11,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from azure.storage.blob import generate_container_sas, ContainerSasPermissions
 from datetime import datetime, timedelta
 import azure.cognitiveservices.speech as speechsdk
-import json
-import firebase_admin
-from firebase_admin import credentials
+
 
 # Load environment variables
 load_dotenv()
