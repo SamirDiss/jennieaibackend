@@ -46,7 +46,7 @@ class Config:
     
     # Azure Search
     SEARCH_END_POINT = os.getenv("jennie_search_endpoint")
-    SEARCH_KEY = os.getenv("jenniev1_search_api_key")
+    SEARCH_KEY = os.getenv("SEARCH_KEY")
     
     # Azure Storage
     STORAGE_ACCOUNT_NAME = os.getenv("AZURE_STORAGE_ACCOUNT_NAME")
@@ -177,10 +177,13 @@ async def get_chat_completion(request: ChatCompletionRequest):
         if request.currentModel == "LottieAI":
             return await _handle_lottie_ai_completion(model, request.messages)
         else:
+            print("Jennei")
             return await _handle_search_based_completion(model, request)
     except ValueError as ve:
+        print("Error is", str(ve))
         raise HTTPException(status_code=400, detail=str(ve))
     except Exception as e:
+        print("Error is", str(e))
         raise HTTPException(status_code=500, detail=f"An unexpected error occurred: {str(e)}")
 
 async def _handle_lottie_ai_completion(model: str, messages: list):
@@ -209,22 +212,16 @@ async def _handle_lottie_ai_completion(model: str, messages: list):
 
 async def _handle_search_based_completion(model: str, request: ChatCompletionRequest):
     """Handle search-based chat completion"""
-    base_params = {
-        "model": model,
-        "messages": request.messages,
-        "max_tokens": 4096,
-        "temperature": 0.3,
-        "top_p": 0.6,
-        "frequency_penalty": 0.2,
-        "presence_penalty": 0.0,
-        "stop": None,
-        "stream": False,
-    }
     
-    if request.searchLibrary in ["ebs-staff-index", "ebs-student-index", "oracle-redwood-index"]:
+    
+    print("search library",request.searchLibrary)
+    print("search endpoint",Config.SEARCH_END_POINT)
+    print("search key",Config.SEARCH_KEY)
+    
+    if request.searchLibrary in ["ebs-staff-index", "ebs-student-index", "oracle-redwood-index","office-of-vc-index","oracle-guided-learning-index"]:
         fields_mapping = {
-            "content_fields_separator": "\n{pageNumber}:\n",
-            "content_fields": ["parent_title", "content"],
+            "content_fields_separator": "\n",
+            "content_fields": [ "content"],
             "filepath_field": "file_name",
             "title_field": "sub_title",
             "url_field": "file_url",
@@ -248,12 +245,12 @@ async def _handle_search_based_completion(model: str, request: ChatCompletionReq
             "semantic_configuration": "default",
             "query_type": "vector_semantic_hybrid",
             "fields_mapping": fields_mapping,
-            "include_contexts": ["citations", "intent", "all_retrieved_documents"] if request.searchLibrary in ["ebs-staff-index", "ebs-student-search", "oracle-redwood-index"] else None,
+            "include_contexts": ["citations", "intent", "all_retrieved_documents"],
             "in_scope": True,
             "role_information": _get_role_information(),
             "filter": None,
             "strictness": 2,
-            "top_n_documents": 20 if request.searchLibrary in ["ebs-staff-index", "ebs-student-search", "oracle-redwood-index"] else 5,
+            "top_n_documents": 20 if request.searchLibrary in ["ebs-staff-index", "ebs-student-index", "oracle-redwood-index","office-of-vc-index","oracle-guided-learning-index"] else 5,
             "authentication": {
                 "type": "api_key",
                 "key": Config.SEARCH_KEY
@@ -263,6 +260,19 @@ async def _handle_search_based_completion(model: str, request: ChatCompletionReq
                 "deployment_name": "embeddings"
             }
         }
+    }
+    
+    base_params = {
+        "model": model,
+        "messages": request.messages,
+        "max_tokens": 4096,
+        "temperature": 0.3,
+        "top_p": 0.6,
+        "frequency_penalty": 0.2,
+        "presence_penalty": 0.0,
+        "stop": None,
+        "stream": False,
+        
     }
     
     return client.chat.completions.create(**base_params, extra_body={"data_sources": [data_source]})
