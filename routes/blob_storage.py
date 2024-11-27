@@ -10,7 +10,7 @@ router = APIRouter()
 def download_blob(request: BlobRequest):
     """Generate SAS URL for blob download"""
     try:
-        sas_token = generate_container_sas_token(request.container_name, expiration_mins=5)
+        sas_token = generate_container_sas_token(request.container_name, expiration_secs=30)
         blob_url_with_sas = f"{request.blob_path}?{sas_token}"
         return {"sas_url": blob_url_with_sas}
     except Exception as e:

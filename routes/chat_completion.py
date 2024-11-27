@@ -1,5 +1,5 @@
 # routes/chat_completion.py
-
+from tenacity import retry, stop_after_attempt, wait_fixed
 from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import StreamingResponse
 from models.schemas import ChatCompletionRequest
@@ -10,6 +10,11 @@ import json
 
 router = APIRouter()
 
+
+@retry(stop=stop_after_attempt(3), wait=wait_fixed(2))
+async def _retry_request(func, *args, **kwargs):
+    print("retried")
+    return await func(*args, **kwargs)
 @router.post("/getChatCompletion")
 async def get_chat_completion(request: ChatCompletionRequest):
     """Handle chat completions for both LottieAI and search-based responses"""
@@ -20,9 +25,9 @@ async def get_chat_completion(request: ChatCompletionRequest):
 
     try:
         if request.currentModel == "LottieAI":
-            return await _handle_lottie_ai_completion(model, request.messages)
+            return await _retry_request(_handle_lottie_ai_completion, model, request.messages)
         else:
-            return await _handle_search_based_completion(model, request)
+            return await _retry_request(_handle_search_based_completion, model, request)
     except ValueError as ve:
         raise HTTPException(status_code=400, detail=str(ve))
     except Exception as e:
@@ -38,9 +43,9 @@ async def get_chat_completion_stream(request: ChatCompletionRequest):
 
     try:
         if request.currentModel == "LottieAI":
-            return await _handle_lottie_ai_completion(model, request.messages)
+            return await _retry_request(_handle_lottie_ai_completion, model, request.messages)
         else:
-            return await _handle_search_based_completion(model, request, stream=True)
+            return await _retry_request(_handle_search_based_completion, model, request, stream=True)
     except ValueError as ve:
         raise HTTPException(status_code=400, detail=str(ve))
     except Exception as e:
@@ -77,8 +82,7 @@ async def _handle_search_based_completion(model: str, request: ChatCompletionReq
     
     
     print("search library",request.searchLibrary)
-    print("search endpoint",Config.SEARCH_END_POINT)
-    print("search key",Config.SEARCH_KEY)
+    
     
     if request.searchLibrary in ["jennie-v1"]:
         
@@ -113,7 +117,7 @@ async def _handle_search_based_completion(model: str, request: ChatCompletionReq
             "role_information": _get_role_information(),
             "filter": None,
             "strictness": 2,
-            "top_n_documents": 20 if request.searchLibrary in ["ebs-staff-index", "ebs-student-index", "oracle-redwood-index","office-of-vc-index","oracle-guided-learning-index"] else 5,
+            "top_n_documents": 5 if request.searchLibrary in ["jennie-v1"] else 20,
             "authentication": {
                 "type": "api_key",
                 "key": Config.SEARCH_KEY

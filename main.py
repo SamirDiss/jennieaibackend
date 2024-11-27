@@ -6,13 +6,13 @@ app = FastAPI()
 
 # CORS Configuration
 origins = [
+    "https://lottieai.azurewebsites.net",
     "http://localhost:4200",
-    "https://lottieai.azurewebsites.net"
 ]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
