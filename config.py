@@ -30,5 +30,5 @@ class Config:
     SPEECH_REGION = os.getenv("SPEECH_REGION")
 
     # Deployment Models
-    DEPLOYMENT_4O = os.getenv("DEPLOYMENT_4o")  # Add this if not already defined
+    DEPLOYMENT_4O = os.getenv("DEPLOYMENT_4o_mini")  # Add this if not already defined
 

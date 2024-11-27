@@ -18,6 +18,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.middleware("http")
+async def add_cors_headers(request, call_next):
+    response = await call_next(request)
+    response.headers["Access-Control-Allow-Origin"] = origins
+    response.headers["Access-Control-Allow-Credentials"] = "true"
+    return response
+
 # Include Routers
 app.include_router(text_to_speech.router)
 app.include_router(chat_completion.router)
