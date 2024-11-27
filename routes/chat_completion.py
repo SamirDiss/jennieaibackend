@@ -80,16 +80,8 @@ async def _handle_search_based_completion(model: str, request: ChatCompletionReq
     print("search endpoint",Config.SEARCH_END_POINT)
     print("search key",Config.SEARCH_KEY)
     
-    if request.searchLibrary in ["ebs-staff-index", "ebs-student-index", "oracle-redwood-index","office-of-vc-index","oracle-guided-learning-index"]:
-        fields_mapping = {
-            "content_fields_separator": "\n",
-            "content_fields": ["content"],
-            "filepath_field": "file_name",
-            "title_field": "sub_title",
-            "url_field": "file_url",
-            "vector_fields": ["vector"]
-        }
-    else:
+    if request.searchLibrary in ["jennie-v1"]:
+        
         fields_mapping = {
             "content_fields_separator": "\n",
             "content_fields": ["content"],
@@ -97,6 +89,15 @@ async def _handle_search_based_completion(model: str, request: ChatCompletionReq
             "title_field": "title",
             "url_field": "url",
             "vector_fields": ["contentVector"]
+        }
+    else:
+        fields_mapping = {
+            "content_fields_separator": "\n",
+            "content_fields": ["content"],
+            "filepath_field": "file_name",
+            "title_field": "sub_title",
+            "url_field": "file_url",
+            "vector_fields": ["vector"]
         }
 
     data_source = {
