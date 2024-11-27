@@ -21,7 +21,7 @@ app.add_middleware(
 @app.middleware("http")
 async def add_cors_headers(request, call_next):
     response = await call_next(request)
-    response.headers["Access-Control-Allow-Origin"] = origins
+    response.headers["Access-Control-Allow-Origin"] = "https://lottieai.azurewebsites.net"
     response.headers["Access-Control-Allow-Credentials"] = "true"
     return response
 
