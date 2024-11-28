@@ -8,6 +8,7 @@ class TextToSpeechRequest(BaseModel):
 class ChatCompletionRequest(BaseModel):
     messages: list
     currentModel: Literal["LottieAI", "JennieAI"]
+    aiModel: dict[str, str, str]
     searchLibrary: str
 
 class BlobRequest(BaseModel):

@@ -5,6 +5,8 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+print("loding config.....")
+
 class Config:
     # Azure OpenAI
     ENDPOINT = os.getenv("ENDPOINT_URL")
