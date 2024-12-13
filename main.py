@@ -8,6 +8,8 @@ app = FastAPI()
 origins = [
     "https://lottieai.azurewebsites.net",
     "http://localhost:4200",
+    "https://jennieai-6sd.com"
+    
 ]
 
 app.add_middleware(
