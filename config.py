@@ -34,3 +34,8 @@ class Config:
     # Deployment Models
     DEPLOYMENT_4O = os.getenv("DEPLOYMENT_4o_mini")  # Add this if not already defined
 
+    # ElevenLabs
+    AGENT_ID = os.getenv("AGENT_ID")
+    XI_API_KEY = os.getenv("XI_API_KEY")
+
+
